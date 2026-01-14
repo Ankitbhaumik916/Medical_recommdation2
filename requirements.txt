@@ -2,11 +2,9 @@ streamlit
 pandas
 numpy
 scikit-learn
-tensorflow
-scikit-surprise
 plotly
-seaborn
-matplotlib
-streamlit-option-menu
 scipy
 joblib
+streamlit-option-menu
+PyJWT
+networkx

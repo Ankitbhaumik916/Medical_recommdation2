@@ -16,6 +16,9 @@ st.set_page_config(
     layout="wide"
 )
 
+from theme import apply_theme
+apply_theme()
+
 # Initialize session state for user data
 if 'user_data' not in st.session_state:
     st.session_state.user_data = {
@@ -83,6 +86,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("<h1 class='main-header'>💊 Personalized Medicine Recommendation</h1>", unsafe_allow_html=True)
+
+# Show notification if coming from disease prediction
+if 'predicted_disease' in st.session_state and 'from_prediction' in st.session_state:
+    st.success(f"🎯 Based on your disease prediction: **{st.session_state.predicted_disease}**")
+    st.info("💡 We've pre-selected your predicted condition. You can change it if needed.")
+    # Clear the flag
+    del st.session_state.from_prediction
 
 # Check if drug data exists
 if st.session_state.drug_data.empty:

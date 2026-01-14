@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from streamlit_option_menu import option_menu
 import warnings
+from auth import check_authentication, logout, init_session_state
 warnings.filterwarnings('ignore')
 
 # Page configuration
@@ -15,106 +16,79 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for charcoal black and orange theme
+# Initialize authentication
+init_session_state()
+
+# Check authentication - redirect to login if not authenticated
+if not check_authentication():
+    st.switch_page("pages/0_🔐_Login.py")
+
+# Custom CSS (keep your existing CSS)
 st.markdown("""
 <style>
-    :root {
-        --primary-color: #FF6B35;  /* Orange */
-        --secondary-color: #1A1A1A; /* Charcoal Black */
-        --background-color: #2D2D2D;
-        --text-color: #FFFFFF;
-        --card-background: #3A3A3A;
-    }
-    
-    .stApp {
-        background-color: var(--secondary-color);
-        color: var(--text-color);
-    }
-    
-    .main-header {
-        color: var(--primary-color);
-        font-size: 2.5rem;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    
-    .sub-header {
-        color: var(--primary-color);
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .card {
-        background-color: var(--card-background);
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px 0;
-        border-left: 5px solid var(--primary-color);
-    }
-    
-    .stButton > button {
-        background-color: var(--primary-color) !important;
-        color: var(--secondary-color) !important;
-        font-weight: bold;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-    }
-    
-    .stButton > button:hover {
-        background-color: #FF8B35 !important;
-    }
-    
-    .stSelectbox, .stNumberInput, .stTextInput {
-        background-color: var(--card-background);
-        color: var(--text-color);
-    }
-    
-    .metric-card {
-        background-color: var(--card-background);
-        border-radius: 10px;
-        padding: 15px;
-        text-align: center;
-        border-top: 4px solid var(--primary-color);
-    }
-    
-    .metric-value {
-        color: var(--primary-color);
-        font-size: 2rem;
-        font-weight: bold;
-    }
-    
-    .metric-label {
-        color: var(--text-color);
-        font-size: 0.9rem;
-        opacity: 0.8;
-    }
+    /* Your existing CSS here */
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state for user data
+# Initialize session state (keep your existing code)
+# In app.py, update the user_data initialization
 if 'user_data' not in st.session_state:
     st.session_state.user_data = {
-        'age': 25,
-        'gender': 'Male',
-        'medical_history': [],
+        'age': st.session_state.user.get('age', 25),
+        'gender': st.session_state.user.get('gender', 'Male'),
+        'medical_history': st.session_state.user.get('medical_history', []),
         'medicine_preferences': [],
-        'symptoms': []
+        'symptoms': [],
+        'height_cm': st.session_state.user.get('height_cm'),
+        'weight_kg': st.session_state.user.get('weight_kg'),
+        'bmi': st.session_state.user.get('bmi'),
+        'bmi_category': st.session_state.user.get('bmi_category')
     }
-
-if 'disease_model' not in st.session_state:
-    st.session_state.disease_model = None
-
-if 'medicine_model' not in st.session_state:
-    st.session_state.medicine_model = None
 
 if 'drug_data' not in st.session_state:
     try:
-        st.session_state.drug_data = pd.read_csv('data/Drug.csv')
+        st.session_state.drug_data = pd.read_csv('Data/Drug.csv')
     except:
         st.session_state.drug_data = pd.DataFrame()
 
+# Update sidebar to include user profile
+with st.sidebar:
+    # User profile section
+    if st.session_state.user:
+        st.markdown(f"""
+        <div style="background-color: #3A3A3A; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #FF6B35, #FF8B35);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-weight: bold;
+                    font-size: 1.2rem;
+                ">
+                    {st.session_state.user['full_name'][0] if st.session_state.user.get('full_name') else 'U'}
+                </div>
+                <div>
+                    <div style="color: white; font-weight: bold;">
+                        {st.session_state.user.get('full_name', 'User')}
+                    </div>
+                    <div style="color: #AAAAAA; font-size: 0.8rem;">
+                        @{st.session_state.user['username']}
+                    </div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Logout button
+    if st.button("🚪 Logout", use_container_width=True):
+        logout()
+        st.rerun()
+    
 # Navigation sidebar
 with st.sidebar:
     st.markdown("<h1 style='color: #FF6B35; text-align: center;'>🏥 Health AI</h1>", unsafe_allow_html=True)
@@ -197,19 +171,19 @@ if selected == "Dashboard":
     
     with col1:
         if st.button("🩺 Predict Disease", use_container_width=True):
-            st.switch_page("pages/2_🤒_Disease_Prediction.py")
+            st.switch_page("pages/2_Disease_Prediction.py")
     
     with col2:
         if st.button("💊 Get Medicine", use_container_width=True):
-            st.switch_page("pages/3_💊_Medicine_Recommendation.py")
+            st.switch_page("pages/3_Medicine_Recommendation.py")
     
     with col3:
         if st.button("📈 View Analytics", use_container_width=True):
-            st.switch_page("pages/4_📊_Analytics.py")
+            st.switch_page("pages/4_Analytics.py")
     
     with col4:
         if st.button("⚙️ Admin Panel", use_container_width=True):
-            st.switch_page("pages/5_⚙️_Admin.py")
+            st.switch_page("pages/5_Admin.py")
     
     # Stats overview
     st.markdown("<h3 class='sub-header'>📊 System Overview</h3>", unsafe_allow_html=True)

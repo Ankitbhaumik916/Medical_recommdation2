@@ -13,6 +13,9 @@ st.set_page_config(
     layout="wide"
 )
 
+from theme import apply_theme
+apply_theme()
+
 # Initialize session state for user data
 if 'user_data' not in st.session_state:
     st.session_state.user_data = {
