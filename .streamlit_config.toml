@@ -1,0 +1,57 @@
+[theme]
+# Primary color (used for buttons, links, etc.)
+primaryColor = "#FF6B35"
+# Background color
+backgroundColor = "#0E1117"
+# Secondary background color (for containers, cards, etc.)
+secondaryBackgroundColor = "#1D1D1D"
+# Text color
+textColor = "#FFFFFF"
+# Font family
+font = "sans serif"
+
+[client]
+# Whether to open the app in the browser
+showErrorDetails = true
+# Raise warning when a widget state is modified
+toolbarMode = "minimal"
+
+[logger]
+# Log level: debug, info, warning, error, critical
+level = "info"
+# Message format
+messageFormat = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+[server]
+# Port for the Streamlit server
+port = 8501
+# Address to run the server on
+address = "localhost"
+# Enable WebSocket compression
+enableWebsocketCompression = true
+# WebSocket message size in megabytes
+maxMessageSize = 200
+# Session timeout in hours
+sessionExpirationSeconds = 3600
+# Max cache entry age in hours
+maxCacheEntryAge = 24
+# Whether to serve over HTTPS
+useSSL = false
+
+[client.toolbarMode]
+minimal = true
+
+[deprecation]
+# Show deprecation warnings
+showPyplotGlobalUse = false
+showfileUploaderEncoding = false
+
+[logger.level]
+streamlit = "info"
+root = "info"
+
+[data]
+# Data directory path
+dataDir = "./Data"
+# Cache directory
+cacheDir = "./.streamlit/cache"
